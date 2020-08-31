@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { Component } from 'react';
 import Header from './components/Header';
 import './App.css';
 import Searchbox from './components/Searchbox';
+import SearchResults from './components/SearchResults';
 
 
 class App extends React.Component{
@@ -45,7 +46,27 @@ class App extends React.Component{
         throw new Error(res.status)
       })
       .then(data => {
-          console.log(data)
+          //console.log(data)
+
+          const bookArr = data.items.map(book=>{
+            const {title,authors,description,imageLinks} = book.volumeInfo
+            const {saleability, retailPrice} = book.saleInfo
+            return{ 
+              title: title,
+              author:authors,
+              description: description,
+              url: imageLinks.thumbnail,
+              saleability:saleability,
+              retailPrice:retailPrice
+
+            }
+            
+          })
+          console.log(bookArr);
+          this.setState({
+            books:bookArr,
+            error: null,
+          })
       })
       .catch(error => {
         console.log(error.message)
@@ -69,11 +90,31 @@ class App extends React.Component{
 
 
   render(){
+    let result = this.state.books
+    const books = result.map(book=>{
+      return <SearchResults 
+      title={book.title}
+      author={book.authors}
+      description={book.description}
+      url= {book.url}
+      saleability={book.saleability}
+      retailPrice={book.retailPrice}
+      
+      />
+
+    }
+    
+      )
+      console.log(books)
+
+
   return (
     <div className="App">
       <Header />
       <Searchbox props={this.state} handleSubmit={this.handleFormSubmit} handleFilterByType={this.handleFilterBookType}  handleSearchText={this.handleSearchText} handleSearch={this.handleFilterPrintType}/>
+  <div className='Results'>{books}</div>
     </div>
+
    )
   }
 }
